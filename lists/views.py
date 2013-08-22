@@ -13,7 +13,7 @@ def new_list(request):
     try:
         Item.objects.create(text=request.POST['item_text'], list=list_)
     except ValidationError:
-        pass
+        return render(request, 'home.html')
     return redirect('/lists/%d/' % (list_.id,))
 
 
