@@ -1,2 +1,2 @@
-Django==1.5.1
+https://github.com/django/django/archive/master.zip 
 gunicorn==17.5
