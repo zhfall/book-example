@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'accounts',
 )
 
+AUTH_USER_MODEL = 'accounts.User'
 AUTHENTICATION_BACKENDS = (
     'accounts.authentication.PersonaAuthenticationBackend',
 )
