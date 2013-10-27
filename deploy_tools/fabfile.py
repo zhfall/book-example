@@ -1,5 +1,6 @@
+from django.utils.crypto import get_random_string
 from fabric.contrib.files import append, exists, sed
-from fabric.api import env, run
+from fabric.api import env, local, run
 from os import path
 
 
@@ -25,14 +26,20 @@ def _create_directory_structure_if_necessary(site_name):
 def _get_latest_source(source_folder):
     if exists(path.join(source_folder, '.git')):
         run('cd %s && git fetch' % (source_folder,))
-        run('cd %s && git reset --hard origin/master' % (source_folder,))
     else:
         run('git clone %s %s' % (REPO_URL, source_folder))
+    current_commit = local("git log -n 1 --format=%H", capture=True)
+    run('cd %s && git reset --hard %s' % (source_folder, current_commit))
 
 def _update_settings(source_folder, site_name):
     settings_path = path.join(source_folder, 'superlists/settings.py')
     sed(settings_path, "DEBUG = True", "DEBUG = False")
     append(settings_path, 'ALLOWED_HOSTS = ["%s"]' % (site_name,))
+    secret_key_file = path.join(source_folder, 'superlists/secret_key.py')
+    if not exists(secret_key_file):
+        key = get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+        append(secret_key_file, "SECRET_KEY = '%s'" % (key,))
+        append(settings_path, 'from .secret_key import SECRET_KEY')
 
 def _update_virtualenv(source_folder):
     virtualenv_folder = path.join(source_folder, '../virtualenv')
@@ -48,7 +55,6 @@ def _update_static_files(source_folder):
         source_folder,
     ))
 
-
 def _update_database(source_folder):
     run('cd %s && ../virtualenv/bin/python3 manage.py syncdb' % (source_folder,))
     # one-off fake database migration. remove me before next deploy
@@ -56,3 +62,4 @@ def _update_database(source_folder):
         source_folder,
     ))
     run('cd %s && ../virtualenv/bin/python3 manage.py migrate' % (source_folder,))
+
