@@ -1,5 +1,4 @@
 from .base import FunctionalTest
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 
@@ -30,8 +29,8 @@ class NewVisitorTest(FunctionalTest):
         # and now the page lists "1: Buy peacock feathers" as an item in a
         # to-do list table
         inputbox.send_keys(Keys.ENTER)
+        self.wait_for_url_to_match_regex('/lists/.+')
         edith_list_url = self.browser.current_url
-        self.assertRegex(edith_list_url, '/lists/.+')
         self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # There is still a text box inviting her to add another item. She
@@ -49,7 +48,7 @@ class NewVisitorTest(FunctionalTest):
         self.browser.quit()
         ## We use a new browser session to make sure that no information
         ## of Edith's is coming through from cookies etc
-        self.browser = webdriver.Firefox()
+        self.browser = self.start_browser()
 
         # Francis visits the home page.  There is no sign of Edith's
         # list
@@ -65,9 +64,8 @@ class NewVisitorTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
 
         # Francis gets his own unique URL
-        francis_list_url = self.browser.current_url
-        self.assertRegex(francis_list_url, '/lists/.+')
-        self.assertNotEqual(francis_list_url, edith_list_url)
+        self.wait_for_url_to_match_regex('/lists/.+')
+        self.assertNotEqual(self.browser.current_url, edith_list_url)
 
         # Again, there is no trace of Edith's list
         page_text = self.browser.find_element_by_tag_name('body').text

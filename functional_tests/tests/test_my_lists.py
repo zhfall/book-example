@@ -25,6 +25,11 @@ class MyListsTest(FunctionalTest):
         print(self.browser.get_cookies())
 
 
+    def wait_to_get_off_homepage(self):
+        self.wait_for(lambda: self.assertNotEqual(
+            self.browser.current_url.rstrip('/'), self.server_url
+        ))
+
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
         # Edith is a logged-in user
         self.create_pre_authenticated_session()
@@ -33,6 +38,7 @@ class MyListsTest(FunctionalTest):
         self.browser.get(self.server_url)
         self.get_item_input_box().send_keys('Reticulate splines\n')
         self.get_item_input_box().send_keys('Immanentize eschaton\n')
+        self.wait_to_get_off_homepage()
         first_list_url = self.browser.current_url
 
         # She notices a "My lists" link, for the first time.
@@ -41,17 +47,19 @@ class MyListsTest(FunctionalTest):
         # She sees that her list is in there, named according to its
         # first list item
         self.browser.find_element_by_link_text('Reticulate splines').click()
-        self.assertEqual(self.browser.current_url, first_list_url)
+        self.wait_for(lambda: self.assertEqual(self.browser.current_url, first_list_url))
 
         # She decides to start another list, just to see
         self.browser.get(self.server_url)
         self.get_item_input_box().send_keys('Click cows\n')
+        self.wait_to_get_off_homepage()
         second_list_url = self.browser.current_url
 
         # Under "my lists", her new list appears
         self.browser.find_element_by_link_text('My lists').click()
         self.browser.find_element_by_link_text('Click cows').click()
-        self.assertEqual(self.browser.current_url, second_list_url)
+        self.wait_to_get_off_homepage()
+        self.wait_for(lambda: self.assertEqual(self.browser.current_url, second_list_url))
 
         # She logs out.  The "My lists" option disappears
         self.browser.find_element_by_id('id_logout').click()

@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 
-from .base import FunctionalTest
+from .base import FunctionalTest, snapshot_on_error
 
 TEST_EMAIL = 'testinggoat@yahoo.com'
 TEST_PASSWORD = 'soFNjTMqMLEtj8W4'
@@ -26,6 +26,18 @@ class LoginTest(FunctionalTest):
         )
 
 
+    def click_persona_next_button(self):
+        buttons = self.browser.find_elements_by_tag_name('button')
+        button_found = False
+        print('found buttons', buttons)
+        for button in buttons:
+            if button.text.lower() == 'next' or button.text.lower() == 'continue':
+                button_found = True
+                button.click()
+        self.assertTrue(button_found, "Couldn't find Persona next button")
+
+
+    @snapshot_on_error
     def test_login_with_persona(self):
         # Edith goes to the awesome superlists site
         # and notices a "Sign in" link for the first time.
@@ -37,7 +49,7 @@ class LoginTest(FunctionalTest):
         self.browser.find_element_by_id(
             'authentication_email'
         ).send_keys(TEST_EMAIL)
-        self.browser.find_element_by_tag_name('button').click()
+        self.click_persona_next_button()
 
         # We get redirected to the Yahoo page
         self.wait_for_element_with_id('username')
