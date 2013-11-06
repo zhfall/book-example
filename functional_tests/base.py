@@ -1,10 +1,12 @@
 from datetime import datetime
 from selenium import webdriver
 import sys
+import time
 
 from django.test import LiveServerTestCase
-
 from .server_tools import reset_database
+
+DEFAULT_WAIT = 3
 
 
 class FunctionalTest(LiveServerTestCase):
@@ -31,7 +33,7 @@ class FunctionalTest(LiveServerTestCase):
             reset_database(self.server_host)
 
         self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(3)
+        self.browser.implicitly_wait(DEFAULT_WAIT)
 
     def tearDown(self):
         if not self._outcomeForDoCleanups.success:
@@ -60,6 +62,16 @@ class FunctionalTest(LiveServerTestCase):
         print('dumping page HTML to', filename)
         with open(filename, 'w') as f:
             f.write(self.browser.page_source)
+
+
+    def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
+        start_time = time.time()
+        while True:
+            try:
+                return function_with_assertion()
+            except AssertionError:
+                if time.time() - start_time > timeout:
+                    raise
 
 
     def get_item_input_box(self):
