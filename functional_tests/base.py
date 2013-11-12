@@ -4,8 +4,10 @@ import sys
 import time
 from selenium.common.exceptions import WebDriverException
 
+from django.conf import settings
 from django.test import LiveServerTestCase
-from .server_tools import reset_database
+from .server_tools import create_session_on_server, reset_database
+from .management.commands.create_session import create_pre_authenticated_session
 
 DEFAULT_WAIT = 3
 
@@ -32,7 +34,6 @@ class FunctionalTest(LiveServerTestCase):
     def setUp(self):
         if self.against_staging:
             reset_database(self.server_host)
-
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(DEFAULT_WAIT)
 
@@ -85,3 +86,18 @@ class FunctionalTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
 
+
+    def create_pre_authenticated_session(self, email):
+        if self.against_staging:
+            session_key = create_session_on_server(self.server_host, email)
+        else:
+            session_key = create_pre_authenticated_session(email)
+        ## to set a cookie we need to first visit the domain.
+        ## 404 pages load the quickest!
+        self.browser.get(self.server_url + "/404_no_such_url/")
+        self.browser.add_cookie(dict(
+            name=settings.SESSION_COOKIE_NAME,
+            value=session_key,
+            path='/',
+        ))
+        print(self.browser.get_cookies())

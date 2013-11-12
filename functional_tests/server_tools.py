@@ -9,11 +9,11 @@ def reset_database(host):
     )
 
 
-def create_session_on_server(host):
+def create_session_on_server(host, email):
     return subprocess.check_output(
         [
             'fab',
-            'create_session_on_server',
+            'create_session_on_server:email={}'.format(email),
             '--host={}'.format(host),
             '--hide=everything,status',
         ],
