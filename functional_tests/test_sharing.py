@@ -11,18 +11,26 @@ class SharingTest(FunctionalTest):
         self.browser.get(self.server_url)
         self.get_item_input_box().send_keys('Get help\n')
 
-        # She notices a "Share this list" icon
-        self.browser.find_element_by_id('id_share_this_list_button').click()
-
-        # A share dialog pops up.
-        # She decides to share with her friend Oniciferous
-        self.browser.find_element_by_css_selector('input[name=email]').send_keys(
-            'oniciferous@email.com\n'
+        # She notices a "Share this list" option
+        share_box = self.browser.find_element_by_css_selector('input[name=email]')
+        self.assertEqual(
+            share_box.get_attribute('placeholder'),
+            'your@friends-email.com'
         )
 
+        share_box.send_keys('oniciferous@email.com\n')
+
+        # The page updates to say that it's shared with Oniciferous:
+        body_text = self.browser.find_element_by_tag_name('body').text
+        self.assertIn('Shared with', body_text)
+        self.assertIn('oniciferous@email.com', body_text)
+
+
         # Oniciferous comes along in a different browser, also logged in
-        ediths_browser = self.browser
-        self.browser = webdriver.Firefox()
+        edith_browser = self.browser
+        oni_browser = webdriver.Firefox()
+        self.addCleanup(lambda: oni_browser.quit())
+        self.browser = oni_browser
         self.create_pre_authenticated_session('oniciferous@email.com')
 
         # Oniciferous goes to the lists page
@@ -43,8 +51,7 @@ class SharingTest(FunctionalTest):
         self.get_item_input_box().send_keys('Hi Edith!')
 
         # When edith refreshes the page, she sees Oniciferous's addition
-        onis_browser = self.browser
-        self.browser = ediths_browser
+        self.browser = edith_browser
         self.browser.refresh()
         self.browser.find_elements_by_link_text('Hi Edith!')
 
