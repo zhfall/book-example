@@ -157,3 +157,16 @@ class ListViewTest(TestCase):
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
+
+
+class ShareListTest(TestCase):
+
+    def test_sharing_list(self):
+        list_ = List.objects.create()
+        response = self.client.post(
+            '/lists/%d/share' % (list_.id,),
+            {'email': 'a@b.com'}
+        )
+
+        self.assertIn(list_.shared_with, 'a@b.com')
+

@@ -20,6 +20,13 @@ class ListModelTest(TestCase):
         list2.full_clean()
 
 
+    def test_shared_with(self):
+        list_ = List.objects.create()
+        list_.shared_with.add('a@b.com')
+        self.assertIn(list_.shared_with('a@b.com'))
+
+
+
 class ListAndItemModelsTest(TestCase):
 
     def test_saving_and_retrieving_items(self):
@@ -86,4 +93,5 @@ class ListAndItemModelsTest(TestCase):
         list1 = List.objects.create()
         item1 = Item.objects.create(list=list1, text='some text')
         self.assertEqual(str(item1), item1.text)
+
 
