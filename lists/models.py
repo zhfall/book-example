@@ -6,14 +6,10 @@ from django.conf import settings
 
 class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    shared_with = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='shared_lists')
 
     def get_absolute_url(self):
         return resolve_url('view_list', self.id)
-
-
-class Share(models.Model):
-    list = models.ForeignKey(List, related_name='shared_with')
-    email = models.EmailField()
 
 
 class Item(models.Model):

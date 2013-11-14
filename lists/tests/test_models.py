@@ -21,9 +21,10 @@ class ListModelTest(TestCase):
 
 
     def test_shared_with(self):
+        user = User.objects.create(email='a@b.com')
         list_ = List.objects.create()
         list_.shared_with.add('a@b.com')
-        self.assertIn(list_.shared_with('a@b.com'))
+        self.assertIn(user, list_.shared_with.all())
 
 
 
