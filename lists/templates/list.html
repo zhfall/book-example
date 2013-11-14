@@ -10,10 +10,18 @@
             <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
         {% endfor %}
     </table>
+
+    <h2>Shared with:</h2>
+    <ul>
+        {% for sharee in list.shared_with.all %}
+            <li>{{ sharee.email }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block more_content %}
-    <form class="form-inline">
+    <form class="form-inline" method="POST" action="{% url 'share_list' list.id %}">
         <input name="email" placeholder="your@friends-email.com" />
+        {% csrf_token %}
     </form>
 {% endblock %}

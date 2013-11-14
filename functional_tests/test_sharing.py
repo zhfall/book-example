@@ -6,8 +6,17 @@ class SharingTest(FunctionalTest):
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
         # Edith is a logged-in user
         self.create_pre_authenticated_session('edith@email.com')
+        edith_browser = self.browser
+        self.addCleanup(edith_browser.quit)
 
-        # She goes to the home page and starts a list
+        # Oniciferous is also hanging out on the lists site
+        oni_browser = webdriver.Firefox()
+        self.addCleanup(oni_browser.quit)
+        self.browser = oni_browser
+        self.create_pre_authenticated_session('oniciferous@email.com')
+
+        # Edith goes to the home page and starts a list
+        self.browser = edith_browser
         self.browser.get(self.server_url)
         self.get_item_input_box().send_keys('Get help\n')
 
@@ -25,15 +34,9 @@ class SharingTest(FunctionalTest):
         self.assertIn('Shared with', body_text)
         self.assertIn('oniciferous@email.com', body_text)
 
-
-        # Oniciferous comes along in a different browser, also logged in
-        edith_browser = self.browser
-        oni_browser = webdriver.Firefox()
-        self.addCleanup(lambda: oni_browser.quit())
+        # Oniciferous now goes to the lists page with his browser
         self.browser = oni_browser
-        self.create_pre_authenticated_session('oniciferous@email.com')
-
-        # Oniciferous goes to the lists page
+        self.browser.get(self.server_url)
         self.browser.find_element_by_link_text('My lists').click()
 
         # He sees edith's list in there!

@@ -13,4 +13,11 @@
     {% endfor %}
     </ul>
 
+    <h2>Shared lists:</h2>
+    <ul>
+        {% for sharee in list.shared_with.all %}
+            <li>{{ sharee.email }}</li>
+        {% endfor %}
+    </ul>
+
 {% endblock more_content %}
