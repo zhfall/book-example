@@ -15,8 +15,8 @@
 
     <h2>Shared lists:</h2>
     <ul>
-        {% for sharee in list.shared_with.all %}
-            <li>{{ sharee.email }}</li>
+        {% for shared_list in user.shared_lists.all %}
+            <li><a href="{{ shared_list.get_absolute_url }}">{{ shared_list.item_set.all.0.text }}</a></li>
         {% endfor %}
     </ul>
 
