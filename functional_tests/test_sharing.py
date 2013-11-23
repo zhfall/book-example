@@ -1,11 +1,9 @@
 from selenium import webdriver
 from .base import FunctionalTest
 
-def get_browser_cleanup_function(browser):
-    def cleanup():
-        try: browser.quit()
-        except: pass
-    return cleanup
+def quit_if_possible(browser):
+    try: browser.quit()
+    except: pass
 
 
 class SharingTest(FunctionalTest):
@@ -14,11 +12,11 @@ class SharingTest(FunctionalTest):
         # Edith is a logged-in user
         self.create_pre_authenticated_session('edith@email.com')
         edith_browser = self.browser
-        self.addCleanup(get_browser_cleanup_function(edith_browser))
+        self.addCleanup(lambda: quit_if_possible(edith_browser))
 
         # Oniciferous is also hanging out on the lists site
         oni_browser = webdriver.Firefox()
-        self.addCleanup(get_browser_cleanup_function(oni_browser))
+        self.addCleanup(lambda: quit_if_possible(oni_browser))
         self.browser = oni_browser
         self.create_pre_authenticated_session('oniciferous@email.com')
 

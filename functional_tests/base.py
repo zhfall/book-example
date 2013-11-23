@@ -41,8 +41,7 @@ class FunctionalTest(LiveServerTestCase):
         if not self._outcomeForDoCleanups.success:
             self.take_screenshot()
             self.dump_html()
-        try: self.browser.quit()
-        except: pass
+        self.browser.quit()
         super().tearDown()
 
 
