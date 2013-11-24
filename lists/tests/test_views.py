@@ -157,24 +157,3 @@ class ListViewTest(TestCase):
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
-
-
-
-class ShareListTest(TestCase):
-
-    def test_redirects_back_to_list(self):
-        list1 = List.objects.create()
-        list2 = List.objects.create()
-        response = self.client.post(
-            '/lists/%d/share' % (list2.id,),
-            {'email': 'a@b.com'}
-        )
-        self.assertRedirects(response, list2.get_absolute_url())
-
-
-    def test_sharing_list(self):
-        list_ = List.objects.create()
-        user = User.objects.create(email='a@b.com')
-        self.client.post('/lists/%d/share' % (list_.id,), {'email': 'a@b.com'})
-        self.assertIn(user, list_.shared_with.all())
-
