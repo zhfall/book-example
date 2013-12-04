@@ -26,6 +26,7 @@ class HomePageTest(TestCase):
 
 
 class NewListTest(TestCase):
+
     def post_new_list(self, text):
         return self.client.post('/lists/new', dict(text=text))
 
@@ -157,3 +158,26 @@ class ListViewTest(TestCase):
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
+
+
+
+class ShareListTest(TestCase):
+
+    def test_sharing_a_list_via_post(self):
+        sharee = User.objects.create(email='share.with@me.com')
+        list_ = List.objects.create()
+        self.client.post(
+            '/lists/%d/share' % (list_.id),
+            {'email': 'share.with@me.com'}
+        )
+        self.assertIn(sharee, list_.shared_with.all())
+
+
+    def test_redirects_after_POST(self):
+        sharee = User.objects.create(email='share.with@me.com')
+        list_ = List.objects.create()
+        response = self.client.post(
+            '/lists/%d/share' % (list_.id),
+            {'email': 'share.with@me.com'}
+        )
+        self.assertRedirects(response, list_.get_absolute_url())
