@@ -19,7 +19,7 @@
         <h3>Shared with</h3>
         <ul>
             {% for sharee in list.shared_with.all %}
-                <li class="sharee-email">{{ sharee.email }}</li>
+                <li>{{ sharee.email }}</li>
             {% endfor %}
         </ul>
     </div>

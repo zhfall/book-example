@@ -3,7 +3,6 @@ User = get_user_model()
 from django.http import HttpRequest
 from django.test import TestCase
 from django.utils.html import escape
-from unittest.mock import patch
 
 from lists.forms import (
     DUPLICATE_ITEM_ERROR, EMPTY_LIST_ERROR,
@@ -164,20 +163,18 @@ class ListViewTest(TestCase):
 
 class ShareListTest(TestCase):
 
-    @patch('lists.views.List')
-    def test_post_leads_to_adding_to_shared_with(self, mockList):
-        self.client.post('/lists/12/share', {'email': 'an email'})
-        mock_list = mockList.objects.get.return_value
-        mock_list.shared_with.add.assert_called_once_with('an email')
+    def test_sharing_a_list_via_post(self):
+        sharee = User.objects.create(email='share.with@me.com')
+        list_ = List.objects.create()
+        self.client.post(
+            '/lists/%d/share' % (list_.id),
+            {'email': 'share.with@me.com'}
+        )
+        self.assertIn(sharee, list_.shared_with.all())
 
 
-    @patch('lists.views.List')
-    def DONTtest_finds_list_based_on_id(self, mockList):
-        self.client.post('/lists/12/share', {'email': 'an email'})
-        mockList.objects.get.assert_called_once_with(id='12')
-
-
-    def DONTtest_redirects_after_POST(self):
+    def test_redirects_after_POST(self):
+        sharee = User.objects.create(email='share.with@me.com')
         list_ = List.objects.create()
         response = self.client.post(
             '/lists/%d/share' % (list_.id),

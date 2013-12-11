@@ -100,12 +100,3 @@ class FunctionalTest(LiveServerTestCase):
             path='/',
         ))
         print(self.browser.get_cookies())
-
-
-    def wait_for_page_to_contain(self, expected_text):
-        self.wait_for(
-            lambda: self.assertIn(
-                expected_text,
-                self.browser.find_element_by_tag_name('body').text
-            )
-        )
