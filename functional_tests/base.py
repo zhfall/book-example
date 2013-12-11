@@ -6,6 +6,7 @@ from selenium.common.exceptions import WebDriverException
 
 from django.conf import settings
 from django.test import LiveServerTestCase
+from .home_and_list_pages import HomePage
 from .server_tools import create_session_on_server, reset_database
 from .management.commands.create_session import create_pre_authenticated_session
 
@@ -75,6 +76,8 @@ class FunctionalTest(LiveServerTestCase):
         # one more try, which will raise any errors if they are outstanding
         return function_with_assertion()
 
+    def start_new_list(self, item_text):
+        return HomePage(self).start_new_list(item_text)
 
     def get_item_input_box(self):
         return self.browser.find_element_by_id('id_text')
