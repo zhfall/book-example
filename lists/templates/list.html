@@ -13,13 +13,14 @@
 {% endblock %}
 
 {% block more_content %}
+<!--
 <div class="row">
 
     <div class="col-md-6 col-md-offset-2">
         <h3>Shared with</h3>
         <ul>
             {% for sharee in list.shared_with.all %}
-                <li>{{ sharee.email }}</li>
+                <li class="list-sharee">{{ sharee.email }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -32,4 +33,5 @@
     </div>
 
 </div>
+-->
 {% endblock %}
