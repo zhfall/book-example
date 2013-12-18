@@ -9,6 +9,7 @@ class HomePage(object):
     def go_to_home_page(self):
         self.test.browser.get(self.test.server_url)
         self.test.wait_for(self.get_item_input)
+        return self
 
 
     def get_item_input(self):
@@ -26,9 +27,9 @@ class HomePage(object):
 
     def go_to_my_lists_page(self):
         self.test.browser.find_element_by_link_text('My lists').click()
-        self.test.wait_for(self.test.assertEqual(
-            self.test.browser.find_elements_by_tag_name('h1'),
-            'My Lists'
+        self.test.wait_for(lambda: self.test.assertEqual(
+            self.test.browser.find_element_by_tag_name('h1').text,
+            'My lists'
         ))
 
 
@@ -75,7 +76,7 @@ class ListPage(object):
 
     def get_shared_with_list(self):
         return self.test.browser.find_elements_by_css_selector(
-            'list-sharee'
+            '.list-sharee'
         )
 
 
