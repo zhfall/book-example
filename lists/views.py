@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 
 from lists.forms import ExistingListItemForm, ItemForm
 from lists.models import List
+import sys
 
 # Create your views here.
 
@@ -29,6 +30,10 @@ def view_list(request, list_id):
 
 
 def share_list(request, list_id):
+    from django.conf import settings
+    print(settings.LOGGING)
+    print('arg', file=sys.stderr)
+    raise Exception('arg!')
     list_ = List.objects.get(id=list_id)
     list_.shared_with.add(request.POST['email'])
     return redirect(list_)

@@ -6,7 +6,20 @@ def quit_if_possible(browser):
     try: browser.quit()
     except: pass
 
+from django.test.testcases import WSGIRequestHandler
+from django.test.utils import override_settings
+from unittest.mock import patch
 
+def debuggable(test_method_or_class):
+    from django.conf import settings
+    settings.MEDIA_URL = '/media/'
+    return patch(
+        'django.test.testcases.QuietWSGIRequestHandler.log_message',
+        WSGIRequestHandler.log_message
+    )(override_settings(DEBUG=True)(test_method_or_class))
+
+
+@debuggable
 class SharingTest(FunctionalTest):
 
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
