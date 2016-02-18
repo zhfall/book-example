@@ -1,0 +1,11 @@
+---
+# create-service elephantsql turtle postgres-dj
+# cf push -f mainfest.yml -n zjmdj
+applications:
+- name: zjmdj
+  instances: 1
+  memory: 256M
+  command: python manage.py migrate --noinput && gunicorn superlists.wsgi --workers 2
+  buildpack: https://github.com/cloudfoundry/buildpack-python.git
+  services:
+  - postgres-dj
